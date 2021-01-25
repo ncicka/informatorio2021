@@ -50,8 +50,6 @@ class Pizza:
 
 
 
-
-
 # Pedido, para instanciar UN pedido. Cada instacia de Pedido, se guardará en "LIstaPedido"
 class Pedido:
     numPedido = 0
@@ -143,28 +141,21 @@ class Pizzeria:
 
 
     def racaudacion(self):
-        rec=0
-        for xPiz in listaMenuPizzas:
-            clave=xPiz.variedadPizza + xPiz.tipoPizza 
-            for xPed in self.__listaPed:
-                clave2= xPed.variedadPizza +  xPed.tipoPizza
-                if clave==clave2:
-                    rec += xPiz.precioPizza * xPed.cantidadPizza
-        return rec
-'''
-    def canti_Monto(self, lista_de_Pizzas):
+        totalPagar=0
+        for xPed in self.listaPedidos:
+            for xDet in xPed.listaDetallePedidos:
+                totalPagar += (xDet.cantidadPizza * xDet.precioPizza)
+        return totalPagar
+        
+
+    def canti_Monto(self):
         listaCanti_Monto=list()
-        for xPiz in lista_de_Pizzas:
-            clave=xPiz.variedadPizza +'-'+ xPiz.tipoPizza 
-            for xPed in self.__listaPed:
-                clave2= xPed.variedadPizza +'-'+  xPed.tipoPizza
-                if clave==clave2:
-                    rec = xPiz.precioPizza * xPed.cantidadPizza
-                    listaCanti_Monto.append( [clave, xPiz.precioPizza, xPed.cantidadPizza, rec] )
+        for xPed in self.listaPedidos:
+            for xDet in xPed.listaDetallePedidos:
+                rec = xDet.precioPizza * xDet.cantidadPizza
+                clave= xDet.pizza.variedadPizza.nombreVariedad+'- '+xDet.pizza.tipoPizza.nombreTipo
+                listaCanti_Monto.append( [clave, xDet.precioPizza, xDet.cantidadPizza, rec] )
         return listaCanti_Monto
-
-'''
-
 
     
     
@@ -240,23 +231,20 @@ for k,v in dic.items():
 print('-'*30)
 
 
-'''
-#	Ingresos (recaudaciones) por períodos de tiempo. 
-lista_de_Pizzas=pizzaMagui.getListaMenu() #obtengo la lista de TODAs las pizzas con sus precios
-rec=losPedidos.racaudacion(lista_de_Pizzas)
+#	Ingresos (recaudaciones) por períodos de tiempo. 
+rec=palmita1.racaudacion()
 print('\n--------------------------')
 print(f'RECAUDACIÓN: ${rec}')
 print('--------------------------')
 
+
 #	Pedidos (cantidad y monto) por períodos de tiempo. 
-lista_de_Pizzas=pizzaMagui.getListaMenu() #obtengo la lista de TODAs las pizzas con sus precios
-lista_Cant_Monto=losPedidos.canti_Monto(lista_de_Pizzas)
+lista_Cant_Monto=palmita1.canti_Monto()
 print('\n--------------------------')
 print('PEDIDOS (CANTIDAD Y MONTO):' )
 print('--------------------------')
 for k in lista_Cant_Monto:
     print(f' {k[0].ljust(25)} -   ${k[1]} * {k[2]} = {k[3]} ')
     
-'''
 
 print('\n')

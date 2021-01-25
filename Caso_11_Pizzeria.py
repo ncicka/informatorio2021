@@ -1,8 +1,7 @@
 
 #aui Magui  Brollo
 from datetime import datetime, date, time, timedelta
-formatoFecha= '%d-%m-%Y'
-formatoHora = '%H:%M:%S'
+FormatoFechaHora= "%d-%m-%Y %H:%M"
 
 # el tipo de la pizza(a la piedra, a la parrilla, de molde)
 class TipoPizza:
@@ -30,7 +29,7 @@ class VariedadPizza:
     def __init__(self, xCodVariedad,xNombreVariedad, xListaIngredientes):
         self.codigoVariedad = xCodVariedad
         self.nombreVariedad = xNombreVariedad
-        self.listaIngredientess = xListaIngredientes
+        self.listaIngredientes = xListaIngredientes
 
     def __str__(self):
         return f'Cod: {self.codigoVariedad} - {self.nombreVariedad} - {self.listaIngredientes}'
@@ -60,16 +59,15 @@ class Pedido:
         Pedido.numPedido += 1
         self.numPedido = Pedido.numPedido
         self.cliente = xCliente
-        self.fechaHoraPedido = xFechaHoraPedido
+        self.fechaHoraPedido = xFechaHoraPedido.strftime(FormatoFechaHora)
         self.demoraMinutos = xDemora
-        self.fechaHoraEntrega = xFechaHoraPedido + timedelta(minutes=xDemora)
+        self.fechaHoraEntrega = (xFechaHoraPedido + timedelta(minutes=xDemora)).strftime(FormatoFechaHora)
         self.listaDetallePedidos = xListaDetallePedido
         self.totalPagar = 0               # se calcula en base a el "Detalle Pedido"
         self.estado = False
         
     def __str__(self):
-        return f'{self.numPedido} - {self.cliente.upper()} | Pidió: {self.fechaHoraPedido}\
-    Retira: {self.fechaHoraEntrega} | ${self.totalPagar}' 
+        return f'{self.numPedido} - {self.cliente.upper()} | Pidió: {self.fechaHoraPedido} | Retira: {self.fechaHoraEntrega.strftime(FormatoFechaHora)} | ${self.totalPagar}' 
  
 
 
@@ -81,7 +79,7 @@ class DetallePedido:
         self.precioPizza = self.pizza.precioPizza  #del OBJ pizza obtengo el Precio Unitario
     
     def __str__(self):
-        return f'{self.cantidadPizza} - {self.pizza.variedadPizza} - ${self.precioPizza}'
+        return f'{self.cantidadPizza} - {self.pizza.variedadPizza.nombreVariedad}-  {self.pizza.tipoPizza.nombreTipo} - ${self.precioPizza}'
 
 
 
@@ -107,55 +105,53 @@ class Pizzeria:
 
     def mostrarPedidos(self):
         print('\nLista de Pedidos de Pizzas: ')
-        totalPagar=0
         for xPed in self.listaPedidos:
-            print(xPed)
-            
-        #print(f'{xPed.numPedido} {xPed.cliente.upper()} | Pidió: {xPed.fechaHoraPedido} Retira: {xPed.fechaHoraEntrega} | ${xPed.totalPagar}' 
-        #print(f'{xPed.listaDetallePedidos}')
-        #     for xDet in xPed.listaDetallePedidos:
-        #         print( f' {xDet.cantidadPizza} - {xDet.pizza.variedadPizza} - ${xDet.precioPizza} '
-        #         totalPagar += (xDet.cantidadPizza * xDet.precioPizza)
-        # print(' TOTAL A PAGAR : $', totalPagar)
-        # prin
-        
-
-'''
-def variedadMasPedida(self):
+            totalPagar=0
+            print(f'{xPed.numPedido} {xPed.cliente.upper()} | Pidió: {xPed.fechaHoraPedido} | Retira: {xPed.fechaHoraEntrega} | ${xPed.totalPagar}')
+            for xDet in xPed.listaDetallePedidos:
+                print ('    ', xDet)
+                totalPagar += (xDet.cantidadPizza * xDet.precioPizza)
+            print(' TOTAL A PAGAR : $', totalPagar)
+            print('\n')
+       
+    def variedadMasPedida(self):
         dic_Variedad=dict()
-        for xPed in self.__listaPed:
-            if dic_Variedad.get(xPed.variedadPizza,'no') == 'no':                # sino esta
-                dic_Variedad[xPed.variedadPizza] = xPed.cantidadPizza    #se agrega al diccionario, con la cantidad
-            else:
-                dic_Variedad[xPed.variedadPizza] += xPed.cantidadPizza
+        for xPed in self.listaPedidos:
+            for xDet in xPed.listaDetallePedidos:
+                if dic_Variedad.get(xDet.pizza.variedadPizza.nombreVariedad,'no') == 'no':                # sino esta
+                    dic_Variedad[xDet.pizza.variedadPizza.nombreVariedad] = xDet.cantidadPizza    #se agrega al diccionario, con la cantidad
+                else:
+                    dic_Variedad[xDet.pizza.variedadPizza.nombreVariedad] += xDet.cantidadPizza
         
         # hay que importar operator para utilizar y ordenar por una clave o valor
-        #d_ordenado = sorted(d.items(), key=operator.itemgetter(1), reverse=True)
-        #tambien se puede utilizar la funcion lambda
+        #d_ordenado = sorted(d.items(), key=operator.itemgetter(1), reverse=True) tambien se puede utilizar la funcion lambda
         dic_ordenado = sorted(dic_Variedad.items(), key=lambda x: x[1], reverse=True)
         return dict(dic_ordenado)
 
+
     def tipoMasPedido(self):
         dic=dict()
-        for xPed in self.listaPed:
-            if dic.get(xPed.tipoPizza,'no') == 'no':                # sino esta
-                dic[xPed.tipoPizza] = xPed.cantidadPizza    #se agrega al diccionario, con la cantidad
-            else:
-                dic[xPed.tipoPizza] += xPed.cantidadPizza
+        for xPed in self.listaPedidos:
+            for xDet in xPed.listaDetallePedidos:
+                if dic.get(xDet.pizza.tipoPizza.nombreTipo,'no') == 'no':                # sino esta
+                    dic[xDet.pizza.tipoPizza.nombreTipo] = xDet.cantidadPizza    #se agrega al diccionario, con la cantidad
+                else:
+                    dic[xDet.pizza.tipoPizza.nombreTipo] += xDet.cantidadPizza
         
         dic_ordenado = sorted(dic.items(), key=lambda x: x[1], reverse=True)
         return dict(dic_ordenado)
-    
-    def racaudacion(self, lista_de_Pizzas):
+
+
+    def racaudacion(self):
         rec=0
-        for xPiz in lista_de_Pizzas:
+        for xPiz in listaMenuPizzas:
             clave=xPiz.variedadPizza + xPiz.tipoPizza 
             for xPed in self.__listaPed:
                 clave2= xPed.variedadPizza +  xPed.tipoPizza
                 if clave==clave2:
                     rec += xPiz.precioPizza * xPed.cantidadPizza
         return rec
-
+'''
     def canti_Monto(self, lista_de_Pizzas):
         listaCanti_Monto=list()
         for xPiz in lista_de_Pizzas:
@@ -220,9 +216,9 @@ palmita1.agregarPedido(ped3)
 
 palmita1.mostrarPedidos()
 
-'''
+
 #	Variedades y tipos de pizzas más pedidas por los clientes. 
-dic=losPedidos.variedadMasPedida()
+dic=palmita1.variedadMasPedida()
 print('\n--------------------------')
 print('VARIEDADES MAS PEDIDAS')
 print('--------------------------')
@@ -232,7 +228,8 @@ for k,v in dic.items():
     print(k.ljust(15),'    ' , v)
 print('--------------------------')
 
-dic=losPedidos.tipoMasPedido()
+
+dic=palmita1.tipoMasPedido()
 print('\n--------------------------')
 print('TIPO     MAS   PEDIDOS')
 print('--------------------------')
@@ -242,6 +239,8 @@ for k,v in dic.items():
     print(k.ljust(15),'    ' , v)
 print('-'*30)
 
+
+'''
 #	Ingresos (recaudaciones) por períodos de tiempo. 
 lista_de_Pizzas=pizzaMagui.getListaMenu() #obtengo la lista de TODAs las pizzas con sus precios
 rec=losPedidos.racaudacion(lista_de_Pizzas)
